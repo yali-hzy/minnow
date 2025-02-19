@@ -58,4 +58,3 @@ uint64_t Reader::bytes_popped() const
 {
   return bytes_popped_;
 }
-
