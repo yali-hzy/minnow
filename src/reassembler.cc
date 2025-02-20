@@ -14,8 +14,9 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     data = data.substr( next_index_ - first_index );
     first_index = next_index_;
   }
-  if ( output_.writer().available_capacity() < data.size() + first_index - next_index_ ) {
-    if ( output_.writer().available_capacity() <= first_index - next_index_ )
+  if ( output_.writer().available_capacity() + next_index_ < data.size()
+       || output_.writer().available_capacity() + next_index_ - data.size() < first_index ) {
+    if ( output_.writer().available_capacity() + next_index_ <= first_index )
       return;
     data.resize( output_.writer().available_capacity() - first_index + next_index_ );
   }
