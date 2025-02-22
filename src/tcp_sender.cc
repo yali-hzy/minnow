@@ -25,7 +25,7 @@ void TCPSender::push( const TransmitFunction& transmit )
           && !FIN_sent_ ) {
     TCPSenderMessage msg;
     msg.seqno = Wrap32::wrap( next_abs_seqno_to_send_, isn_ );
-    uint64_t bytes_to_read = min( min( TCPConfig::MAX_PAYLOAD_SIZE, reader().bytes_buffered() ),
+    const uint64_t bytes_to_read = min( min( TCPConfig::MAX_PAYLOAD_SIZE, reader().bytes_buffered() ),
                                   last_abs_ack_received_ + max( 1, static_cast<int>( rcv_wnd_ ) )
                                     - next_abs_seqno_to_send_ - !SYN_sent_ );
     msg.SYN = !SYN_sent_;
@@ -72,7 +72,7 @@ void TCPSender::receive( const TCPReceiverMessage& msg )
     reader().set_error();
   if ( !msg.ackno.has_value() )
     return;
-  uint64_t abs_ackno = msg.ackno->unwrap( isn_, reader().bytes_popped() );
+  const uint64_t abs_ackno = msg.ackno->unwrap( isn_, reader().bytes_popped() );
   if ( abs_ackno > next_abs_seqno_to_send_ || abs_ackno <= last_abs_ack_received_ )
     return;
   auto it = outstanding_.lower_bound( { abs_ackno, TCPSenderMessage() } );
