@@ -5,6 +5,7 @@
 #include "tcp_sender_message.hh"
 
 #include <functional>
+#include <set>
 
 class TCPSender
 {
@@ -42,4 +43,19 @@ private:
   ByteStream input_;
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
+
+  uint64_t RTO_ { initial_RTO_ms_ };
+  uint16_t rcv_wnd_ = 1;
+  uint64_t last_abs_ack_received_ = 0;
+  uint64_t next_abs_seqno_to_send_ = 0;
+  bool SYN_sent_ = false;
+  bool FIN_sent_ = false;
+  uint64_t timer_ = 0;
+  bool timer_running_ = false;
+  std::function<bool( const std::pair<uint64_t, TCPSenderMessage>&, const std::pair<uint64_t, TCPSenderMessage>& )>
+    compare = []( const std::pair<uint64_t, TCPSenderMessage>& a, const std::pair<uint64_t, TCPSenderMessage>& b ) {
+      return a.first < b.first;
+    };
+  std::set<std::pair<uint64_t, TCPSenderMessage>, decltype( compare )> outstanding_ { compare };
+  uint64_t consecutive_retransmissions_ = 0;
 };
