@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <queue>
+#include <unordered_map>
 
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
@@ -82,4 +83,12 @@ private:
 
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
+
+  std::unordered_map<uint32_t, std::pair<EthernetAddress, size_t>> arp_table_ {};
+  size_t timer_ = 0;
+  static const size_t ARP_REQUEST_INTERVAL_MS = 5000;
+  static const size_t ARP_TIMEOUT_MS = 30000;
+
+  std::unordered_map<uint32_t, std::queue<std::pair<InternetDatagram, size_t>>> datagrams_to_send_ {};
+  std::unordered_map<uint32_t, size_t> arp_requests_ {};
 };

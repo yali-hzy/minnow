@@ -26,8 +26,8 @@ void TCPSender::push( const TransmitFunction& transmit )
     TCPSenderMessage msg;
     msg.seqno = Wrap32::wrap( next_abs_seqno_to_send_, isn_ );
     const uint64_t bytes_to_read = min( min( TCPConfig::MAX_PAYLOAD_SIZE, reader().bytes_buffered() ),
-                                  last_abs_ack_received_ + max( 1, static_cast<int>( rcv_wnd_ ) )
-                                    - next_abs_seqno_to_send_ - !SYN_sent_ );
+                                        last_abs_ack_received_ + max( 1, static_cast<int>( rcv_wnd_ ) )
+                                          - next_abs_seqno_to_send_ - !SYN_sent_ );
     msg.SYN = !SYN_sent_;
     SYN_sent_ = true;
     if ( bytes_to_read ) {
