@@ -73,7 +73,7 @@ void NetworkInterface::recv_frame( EthernetFrame frame )
   if ( frame.header.type == EthernetHeader::TYPE_IPv4 ) {
     InternetDatagram dgram;
     dgram.parse( parser );
-    datagrams_received_.push( dgram );
+    datagrams_received_.push( std::move( dgram ) );
   } else if ( frame.header.type == EthernetHeader::TYPE_ARP ) {
     ARPMessage arp_message;
     arp_message.parse( parser );
