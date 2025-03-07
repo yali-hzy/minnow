@@ -30,8 +30,7 @@ NetworkInterface::NetworkInterface( string_view name,
 //! can be converted to a uint32_t (raw 32-bit IP address) by using the Address::ipv4_numeric() method.
 void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Address& next_hop )
 {
-  uint32_t next_hop_ip = next_hop.ipv4_numeric();
-  EthernetAddress next_hop_eth;
+  const uint32_t next_hop_ip = next_hop.ipv4_numeric();
   Serializer serializer;
   EthernetFrame frame;
   if ( arp_table_.find( next_hop_ip ) == arp_table_.end() ) {
@@ -52,8 +51,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
     transmit( frame );
     arp_requests_[next_hop_ip] = timer_;
   } else {
-    next_hop_eth = arp_table_[next_hop_ip].first;
-    frame.header.dst = next_hop_eth;
+    frame.header.dst = arp_table_[next_hop_ip].first;
     frame.header.src = ethernet_address_;
     frame.header.type = EthernetHeader::TYPE_IPv4;
     dgram.serialize( serializer );
@@ -70,8 +68,8 @@ void NetworkInterface::recv_frame( EthernetFrame frame )
   Parser parser( frame.payload );
   Serializer serializer;
   EthernetFrame frame_to_send;
+  InternetDatagram dgram;
   if ( frame.header.type == EthernetHeader::TYPE_IPv4 ) {
-    InternetDatagram dgram;
     dgram.parse( parser );
     datagrams_received_.push( std::move( dgram ) );
   } else if ( frame.header.type == EthernetHeader::TYPE_ARP ) {
@@ -94,7 +92,7 @@ void NetworkInterface::recv_frame( EthernetFrame frame )
     }
     arp_table_[arp_message.sender_ip_address] = { arp_message.sender_ethernet_address, timer_ };
     while ( !datagrams_to_send_[arp_message.sender_ip_address].empty() ) {
-      InternetDatagram dgram = std::move( datagrams_to_send_[arp_message.sender_ip_address].front().first );
+      dgram = std::move( datagrams_to_send_[arp_message.sender_ip_address].front().first );
       datagrams_to_send_[arp_message.sender_ip_address].pop();
       frame_to_send.header.dst = arp_message.sender_ethernet_address;
       frame_to_send.header.src = ethernet_address_;
