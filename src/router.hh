@@ -34,4 +34,25 @@ public:
 private:
   // The router's collection of network interfaces
   std::vector<std::shared_ptr<NetworkInterface>> interfaces_ {};
+
+  class Trie
+  {
+  public:
+    Trie() : root( std::make_shared<TrieNode>() ) {}
+    std::pair<std::optional<Address>, std::optional<size_t>> longest_prefix_match( uint32_t address ) const;
+    void insert( uint32_t route_prefix,
+                 uint8_t prefix_length,
+                 std::optional<Address> next_hop,
+                 size_t interface_num );
+
+  private:
+    class TrieNode
+    {
+    public:
+      std::array<std::shared_ptr<TrieNode>, 2> children {};
+      std::optional<Address> next_hop {};
+      std::optional<size_t> interface_num {};
+    };
+    std::shared_ptr<TrieNode> root;
+  } trie {};
 };
