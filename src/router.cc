@@ -69,9 +69,8 @@ void Router::Trie::insert( const uint32_t route_prefix,
   std::shared_ptr<TrieNode> current = root;
   for ( int i = 31; i >= 32 - prefix_length; i-- ) {
     const bool bit = ( route_prefix >> i ) & 1;
-    if ( current->children[bit] == nullptr ) {
+    if ( current->children[bit] == nullptr )
       current->children[bit] = std::make_shared<TrieNode>();
-    }
     current = current->children[bit];
   }
   current->next_hop = next_hop;

@@ -5,9 +5,8 @@ using namespace std;
 
 void Reassembler::insert( uint64_t first_index, string data, bool is_last_substring )
 {
-  if ( is_last_substring ) {
+  if ( is_last_substring )
     last_index_ = first_index + data.size();
-  }
   if ( first_index < next_index_ ) {
     if ( first_index + data.size() <= next_index_ )
       return;
@@ -26,17 +25,14 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     if ( it->first + it->second.size() > first_index ) {
       // Overlapping with previous
       const uint64_t overlap = it->first + it->second.size() - first_index;
-      if ( overlap >= data.size() ) {
+      if ( overlap >= data.size() )
         // Fully covered by previous
         return;
-      }
       pending_[it->first] = it->second + data.substr( overlap );
-    } else {
+    } else
       it = pending_.insert( { first_index, data } ).first;
-    }
-  } else {
+  } else
     it = pending_.insert( { first_index, data } ).first;
-  }
   // Now we have the new data in 'it'
   // Check if we can merge with next
   while ( it != pending_.end() ) {
@@ -62,9 +58,8 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     next_index_ += it->second.size();
     pending_.erase( it );
   }
-  if ( next_index_ == last_index_ ) {
+  if ( next_index_ == last_index_ )
     output_.writer().close();
-  }
 }
 
 // How many bytes are stored in the Reassembler itself?
@@ -72,8 +67,7 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
 uint64_t Reassembler::count_bytes_pending() const
 {
   uint64_t count = 0;
-  for ( const auto& [index, data] : pending_ ) {
+  for ( const auto& [index, data] : pending_ )
     count += data.size();
-  }
   return count;
 }

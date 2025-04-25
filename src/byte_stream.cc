@@ -6,9 +6,8 @@ ByteStream::ByteStream( uint64_t capacity ) : capacity_( capacity ) {}
 
 void Writer::push( string data )
 {
-  if ( data.size() + buffer_.size() > capacity_ ) {
+  if ( data.size() + buffer_.size() > capacity_ )
     data.resize( capacity_ - buffer_.size() );
-  }
   buffer_ += data;
   bytes_pushed_ += data.size();
 }

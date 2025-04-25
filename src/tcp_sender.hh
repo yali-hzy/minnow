@@ -52,7 +52,8 @@ private:
   bool FIN_sent_ = false;
   uint64_t timer_ = 0;
   bool timer_running_ = false;
-  std::function<bool( const std::pair<uint64_t, TCPSenderMessage>&, const std::pair<uint64_t, TCPSenderMessage>& )>
+  const std::function<bool( const std::pair<uint64_t, TCPSenderMessage>&,
+                            const std::pair<uint64_t, TCPSenderMessage>& )>
     compare = []( const std::pair<uint64_t, TCPSenderMessage>& a, const std::pair<uint64_t, TCPSenderMessage>& b ) {
       return a.first < b.first;
     };
