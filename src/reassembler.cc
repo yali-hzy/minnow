@@ -28,11 +28,11 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
       if ( overlap >= data.size() )
         // Fully covered by previous
         return;
-      pending_[it->first] = it->second + data.substr( overlap );
+      it->second.append( data.substr( overlap ) );
     } else
-      it = pending_.insert( { first_index, data } ).first;
+      it = pending_.insert( { first_index, move( data ) } ).first;
   } else
-    it = pending_.insert( { first_index, data } ).first;
+    it = pending_.insert( { first_index, move( data ) } ).first;
   // Now we have the new data in 'it'
   // Check if we can merge with next
   while ( it != pending_.end() ) {
@@ -41,9 +41,8 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     if ( it != pending_.end() && current->first + current->second.size() >= it->first ) {
       // Overlapping with next
       const uint64_t overlap = current->first + current->second.size() - it->first;
-      if ( overlap < it->second.size() ) {
-        pending_[current->first] = current->second + it->second.substr( overlap );
-      }
+      if ( overlap < it->second.size() )
+        current->second.append( it->second.substr( overlap ) );
       pending_.erase( it );
       it = current;
     } else {
