@@ -35,20 +35,15 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
     it = pending_.insert( { first_index, move( data ) } ).first;
   // Now we have the new data in 'it'
   // Check if we can merge with next
-  while ( it != pending_.end() ) {
-    auto current = it;
-    ++it;
-    if ( it != pending_.end() && current->first + current->second.size() >= it->first ) {
-      // Overlapping with next
-      const uint64_t overlap = current->first + current->second.size() - it->first;
-      if ( overlap < it->second.size() )
-        current->second.append( it->second.substr( overlap ) );
-      pending_.erase( it );
-      it = current;
-    } else {
-      it = current;
-      break;
-    }
+  // assert( it != pending_.end() );
+  auto next_it = next( it );
+  while ( next_it != pending_.end() && it->first + it->second.size() >= next_it->first ) {
+    // Overlapping with next
+    const uint64_t overlap = it->first + it->second.size() - next_it->first;
+    if ( overlap < next_it->second.size() )
+      it->second.append( next_it->second.substr( overlap ) );
+    pending_.erase( next_it );
+    next_it = next( it );
   }
   // Now we have the new data in 'it' and it doesn't overlap with next
   // Check if we can write to output
